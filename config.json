@@ -1,0 +1,17 @@
+{
+  "exporter": {
+    "port":     8080,
+    "interval": 60,
+    "pools": true,
+    "storage_resources": true,
+    "metrics": ["sp_cifs_global_basic_writeBytesRate", "sp_cifs_smb1_usage_currentConnections","sp_net_device_pktsInRate","sp_net_device_pktsOut"]
+  },
+  "unitys": [
+    {
+      "ip": "192.168.2.190",
+      "port": "",
+      "user": "admin",
+      "password": "Password123!"
+    }
+  ]
+}
