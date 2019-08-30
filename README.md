@@ -7,8 +7,8 @@ Unity2Prom is a tool written in Go for exporting usage and performance metrics f
 
 For RestAPI connectivity to the different Unity arrays [gounity by Equelin](https://github.com/equelin/gounity.git) is used.
 
-##Configuration
-###Configure the Exporter
+## Configuration
+### Configure the Exporter
 Before starting the exporter it is required to update *config.json* with values specific to your environment:
 ```json
 {
@@ -51,7 +51,7 @@ Possible metrics and their description can be found in *unity_metrics.json*:
   },
 ```
 
-###Configure Prometheus Scrape Job
+### Configure Prometheus Scrape Job
 
 In order to configure Prometheus to scrape the newly added metric it is requried to add another scrape_config entriy to the 
 promehteus configuration file:
@@ -64,5 +64,19 @@ scrape_configs:
   scheme: http
   static_configs:
   - targets:
-    - <unity.fqdn|ip_adress>:9090
+    - <unity.fqdn|ip_adress>:9090    
 ```
+
+## Installation
+After installing go and cloning this repositroy it is requried to install the following go dependencies:
+- github.com/equelin/gounity
+- github.com/prometheus/client_golang/prometheus
+- github.com/prometheus/client_golang/prometheus/promhttp
+
+This can be done using go *get -u <dependency_name>*
+
+*Start the collector*
+In the project base directory run
+**go build**
+**go run main.go utils.go unitycollector.go**
+
