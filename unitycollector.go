@@ -4,6 +4,8 @@ import (
 	"log"
 	"strings"
 	"time"
+	"fmt"
+	"strconv"
 
 	"github.com/equelin/gounity"
 	"github.com/prometheus/client_golang/prometheus"
@@ -130,21 +132,23 @@ func (uc UnityCollector) CollectMetrics() {
 		for _, metric := range uc.Metrics {
 
 			if metric.Realtime {
-				log.Print("UnityCollector - Collector: Realtime Metric - " + metric.PromPath)
+				//log.Print("UnityCollector - Collector: Realtime Metric - " + metric.PromPath)
 				realtimeMetrics = append(realtimeMetrics, metric)
 				realtimeMetricPaths = append(realtimeMetricPaths, metric.Path)
 
 			}
 
 			if metric.Historic {
-				log.Print("UnityCollector - Collector: Historic Metric - " + metric.PromPath)
+			//	log.Print("UnityCollector - Collector: Historic Metric - " + metric.PromPath)
 				//MetricValue, err := uc.Session.GetmetricValue(p)
 				MetricValue, err := uc.Unity.Session.GetmetricValue(metric.Path)
 				if err != nil {
 					log.Print("UnityCollector - Collector: Could not get " + metric.PromPath)
 				} else {
 					//Historic Metric contians multiple result entries with [0] being the latest
-					parseResult(MetricValue.Entries[0].Content.Values.(map[string]interface{}), metric.PromGauge, labels)
+					if MetricValue.Entries[0].Content.Values != nil {
+						parseResult(MetricValue.Entries[0].Content.Values.(map[string]interface{}), metric.PromGauge, labels)
+					}
 				}
 			}
 		}
@@ -231,14 +235,14 @@ func (uc UnityCollector) CollectStorageResourceMetrics() {
 //								}
 //// TODO: Description
 func parseResult(valuesMap map[string]interface{}, promGauge *prometheus.GaugeVec, labels []string) {
-
 	//Current level of the values map
 	for key, val := range valuesMap {
 		labels := append(labels, key)
 		//Switch statement to decicde if current element is anohter map
 		//If yes -> further recursion
 		//If no  -> print values
-		switch val.(type) {
+		//log.Print(val)
+		switch vt := val.(type) {
 
 		//First case is an encaspulated value
 		case map[string]interface{}:
@@ -250,9 +254,22 @@ func parseResult(valuesMap map[string]interface{}, promGauge *prometheus.GaugeVe
 				labels)
 
 		//came to none map value
-		default:
+		case string:
+			valstr := fmt.Sprintf("%s",vt)
+			val64, _ := strconv.ParseFloat(valstr, 64)
+			//log.Print(labels, vt," string ",valstr,val64 )
+			promGauge.WithLabelValues(labels...).Set(val64)
+		case int32, int64:
+			log.Print(labels, vt," int" )
+		case float64:
+			//log.Print(labels, vt," float" )
 			val, _ := val.(float64)
 			promGauge.WithLabelValues(labels...).Set(val)
+		default:
+			log.Print(labels, vt," default" )
+			val, _ := val.(float64)
+			promGauge.WithLabelValues(labels...).Set(val)
+			
 		}
 	}
 }
