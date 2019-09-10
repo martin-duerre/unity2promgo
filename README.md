@@ -3,8 +3,6 @@ Prometheus Exporter for DellEMC Unity
 
 Unity2Prom is a tool written in Go for exporting usage and performance metrics from Dell EMC Unity storage arrays to prometheus.
 
-![alt text](https://raw.githubusercontent.com/username/martin-duerre/unity2promgo/images/unityexporter_metrics.)
-
 For RestAPI connectivity to the different Unity arrays [gounity by Equelin](https://github.com/equelin/gounity.git) is used.
 
 ## Configuration
