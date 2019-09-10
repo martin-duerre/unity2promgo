@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/equelin/gounity"
@@ -84,7 +85,7 @@ func main() {
 			log.Fatal(err)
 		}
 		u.Session = *session
-		defer session.CloseSession()
+		//defer session.CloseSession()
 
 		// Get system informations
 		System, err := session.GetbasicSystemInfo()
@@ -94,6 +95,7 @@ func main() {
 			// Store the name of the Unity
 			u.Name = System.Entries[0].Content.Name
 		}
+		session.CloseSession()
 		log.Print("main.go:main - Unity Name: " + u.Name)
 		unityCollectors = append(unityCollectors, NewUnityCollector(u, selectedMetrics, exporter, poolMetrics, storageMetrics))
 	}
@@ -103,6 +105,11 @@ func main() {
 	go func() {
 		for {
 			for _, uc := range unityCollectors {
+				session, err := gounity.NewSession(uc.Unity.IP, true, uc.Unity.User, uc.Unity.Password)
+				if err != nil {
+					log.Fatal(err)
+				}
+				uc.Unity.Session = *session
 				//log.Print(uc.Unity.Name)
 				if exporter.Pools {
 					uc.CollectPoolMetrics()
@@ -111,11 +118,12 @@ func main() {
 					uc.CollectStorageResourceMetrics()
 				}
 				uc.CollectMetrics()
+				uc.Unity.Session.CloseSession()
 			}
 			time.Sleep(time.Duration(exporter.Interval) * time.Second)
 		}
 	}()
 
 	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(strconv.Itoa(exporter.Port), nil))
 }

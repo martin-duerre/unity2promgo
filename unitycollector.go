@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
-	"fmt"
-	"strconv"
 
 	"github.com/equelin/gounity"
 	"github.com/prometheus/client_golang/prometheus"
@@ -139,7 +139,7 @@ func (uc UnityCollector) CollectMetrics() {
 			}
 
 			if metric.Historic {
-			//	log.Print("UnityCollector - Collector: Historic Metric - " + metric.PromPath)
+				//	log.Print("UnityCollector - Collector: Historic Metric - " + metric.PromPath)
 				//MetricValue, err := uc.Session.GetmetricValue(p)
 				MetricValue, err := uc.Unity.Session.GetmetricValue(metric.Path)
 				if err != nil {
@@ -255,21 +255,21 @@ func parseResult(valuesMap map[string]interface{}, promGauge *prometheus.GaugeVe
 
 		//came to none map value
 		case string:
-			valstr := fmt.Sprintf("%s",vt)
+			valstr := fmt.Sprintf("%s", vt)
 			val64, _ := strconv.ParseFloat(valstr, 64)
 			//log.Print(labels, vt," string ",valstr,val64 )
 			promGauge.WithLabelValues(labels...).Set(val64)
 		case int32, int64:
-			log.Print(labels, vt," int" )
+			log.Print(labels, vt, " int")
 		case float64:
 			//log.Print(labels, vt," float" )
 			val, _ := val.(float64)
 			promGauge.WithLabelValues(labels...).Set(val)
 		default:
-			log.Print(labels, vt," default" )
+			log.Print(labels, vt, " default")
 			val, _ := val.(float64)
 			promGauge.WithLabelValues(labels...).Set(val)
-			
+
 		}
 	}
 }
