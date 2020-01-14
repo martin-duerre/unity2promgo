@@ -50,7 +50,7 @@ type Config struct {
 
 //Exporter represents a single Unity RestAPI client
 type Exporter struct {
-	Port             int      `json:"port"`
+	Port             string   `json:"port"`
 	Interval         int      `json:"interval"`
 	Metrics          []string `json:"metrics"`
 	Pools            bool     `json:"pools"`
