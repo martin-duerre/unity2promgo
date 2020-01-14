@@ -11,7 +11,7 @@ Before starting the exporter it is required to update *config.json* with values 
 ```json
 {
   "exporter": {
-    "port":     8080,
+    "port": ":8080",
     "interval": 60,
     "pools": true,
     "storage_resources": true,
